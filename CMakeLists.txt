@@ -1,30 +1,11 @@
 cmake_minimum_required(VERSION 3.25...3.30)
 
-# Toolchain file is set in CMakePresets.json
-message(STATUS "Toolchain file is: " ${CMAKE_TOOLCHAIN_FILE})
-
-# use pre-built picotool if present:
-if(EXISTS "$ENV{PICO_SDK_PATH}/../picotool")
-  set(picotool_DIR $ENV{PICO_SDK_PATH}/../picotool)
-  message(STATUS "picotool found in: " ${picotool_DIR})
-else()
-  message(STATUS "picotool not found, need to build it.")
-endif()
-
-# use pre-built pioasm if present:
-if(EXISTS "$ENV{PICO_SDK_PATH}/../pioasm")
-  set(pioasm_DIR $ENV{PICO_SDK_PATH}/../pioasm)
-  message(STATUS "pioasm found in: " ${pioasm_DIR})
-  add_executable(Pioasm IMPORTED)
-  set_property(TARGET Pioasm PROPERTY IMPORTED_LOCATION  ${pioasm_DIR})
-  set(Pioasm_FOUND 1)
-else()
-  message(STATUS "pioasm not found, need to build it.")
-endif()
+# export compilation db
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Required for McuLib, to know the target system
 set(
-  MCULIB_TARGET RP2040 CACHE STRING 
+  MCULIB_TARGET RP2040 CACHE STRING
   "Select McuLib target: MCUXPRESSO, RP2040 or ESP32"
 )
 
@@ -36,9 +17,16 @@ set(PICO_PLATFORM rp2040)
 set(PICO_BOARD pico_w) # pico or pico_w
 
 # initialize the SDK based on PICO_SDK_PATH
-# note: this must happen before project()
-# Include build functions from Pico SDK
-include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+set(PICO_SDK_FETCH_FROM_GIT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external")
+set(PICO_SDK_FETCH_FROM_GIT on)
+include(pico_sdk_import.cmake)
+
+# Toolchain file is set in CMakePresets.json
+message(STATUS "SDK path: ${PICO_SDK_PATH}")
+set(CMAKE_TOOLCHAIN_FILE "${PICO_SDK_PATH}/cmake/preload/toolchains/pico_arm_cortex_m0plus_gcc.cmake")
+message(STATUS "Toolchain file is: " ${CMAKE_TOOLCHAIN_FILE})
+file(COPY_FILE .devcontainer/newlib_interface.c.patched "${PICO_SDK_PATH}/src/rp2_common/pico_clib_interface/newlib_interface.c")
+
 
 # set project name ${CMAKE_PROJECT_NAME}
 project(TSM_PicoW_Blinky
