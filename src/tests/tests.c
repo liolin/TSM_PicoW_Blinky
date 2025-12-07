@@ -20,6 +20,10 @@ static void TestArgFailed(void) {
   TEST_ASSERT_MESSAGE(false, "wrong test_arg value");
 }
 
+static void TestArgFailed2(void) {
+  TEST_ASSERT_MESSAGE(false, "wrong test_arg value");
+}
+
 static void TestTask(void *pv) {
   int nofFailures;
   int nofBytes;
@@ -34,7 +38,7 @@ static void TestTask(void *pv) {
      } else if (McuUtility_strcmp(buf, "Led_2")==0) {
       RUN_TEST(TestLeds_Toggle);
      } else {
-      RUN_TEST(TestArgFailed);
+      RUN_TEST(TestArgFailed2);
      }
   } else {
     RUN_TEST(TestArgFailed);
