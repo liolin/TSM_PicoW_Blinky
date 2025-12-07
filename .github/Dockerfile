@@ -47,13 +47,15 @@ RUN \
     && cd pico-sdk/ \
     && git checkout tags/2.0.0 \
     && git submodule update --init
-    
+
 # Set the Pico SDK environment variable
 ENV PICO_SDK_PATH=/project/pico-sdk/
 
 # Copy project sources into image
 COPY CMakePresets.json          /project/
 COPY CMakeLists.txt             /project/
+COPY pico_sdk_import.cmake      /project/
+COPY .devcontainer              /project/.devcontainer/
 COPY gcovr                      /project/gcovr/
 COPY doxy                       /project/doxy/
 COPY McuLib                     /project/McuLib/
